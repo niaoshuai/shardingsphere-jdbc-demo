@@ -44,6 +44,9 @@ public class ShardingJdbcTests {
 
         // 创建 ShardingSphereDataSource
         DataSource dataSource = ShardingSphereDataSourceFactory.createDataSource("ds0", dataSource1, Collections.<RuleConfiguration>singleton(shardingRuleConfig), new Properties());
+
+        /* 查询逻辑 */
+
         String sql = "SELECT i.* FROM t_order o JOIN t_order_item i ON o.order_id=i.order_id WHERE o.user_id=? AND o.order_id=?";
         try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 // 进入 t_order1 表
@@ -57,6 +60,19 @@ public class ShardingJdbcTests {
                     System.out.println("rs = " + rs.getInt(1));
                 }
             }
+        }
+
+        /* 插入逻辑 */
+        String sql2 = "INSERT INTO t_order (user_id, order_id) VALUES (?,?);";
+        try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql2)) {
+// 进入 t_order1 表
+//            ps.setInt(1, 6);
+//            ps.setInt(2, 1003);
+// 进入 t_order0 表
+            ps.setInt(1, 6);
+            ps.setInt(2, 1004);
+            int rows = ps.executeUpdate();
+            System.out.println("rows = " + rows);
         }
     }
 
