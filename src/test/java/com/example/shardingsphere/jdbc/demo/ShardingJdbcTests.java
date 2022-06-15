@@ -46,11 +46,15 @@ public class ShardingJdbcTests {
         DataSource dataSource = ShardingSphereDataSourceFactory.createDataSource("ds0", dataSource1, Collections.<RuleConfiguration>singleton(shardingRuleConfig), new Properties());
         String sql = "SELECT i.* FROM t_order o JOIN t_order_item i ON o.order_id=i.order_id WHERE o.user_id=? AND o.order_id=?";
         try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, 10);
-            ps.setInt(2, 1001);
+// 进入 t_order1 表
+//            ps.setInt(1, 2);
+//            ps.setInt(2, 1001);
+// 进入 t_order0 表
+            ps.setInt(1, 1);
+            ps.setInt(2, 1000);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    // ...
+                    System.out.println("rs = " + rs.getInt(1));
                 }
             }
         }
